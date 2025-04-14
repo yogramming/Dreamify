@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dream Interpreter</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>💭 Dream Interpreter Bot</h1>
+    
+    <div class="chat-box">
+      <textarea id="prompt" placeholder="Describe your dream here..."></textarea>
+      <button onclick="sendPrompt()">Interpret</button>
+    </div>
+
+    <div id="response" class="response-box"></div>
+  </div>
+
+  <script>
+    async function sendPrompt() {
+      const prompt = document.getElementById("prompt").value.trim();
+      const responseDiv = document.getElementById("response");
+
+      if (!prompt) {
+        responseDiv.innerHTML = "<p>Please enter a dream to interpret.</p>";
+        return;
+      }
+
+      responseDiv.innerHTML = "<p>Interpreting your dream...</p>";
+
+      try {
+        const res = await fetch("/interpret", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt }),
+        });
+
+        const data = await res.json();
+        responseDiv.innerHTML = marked.parse(data.reply);
+      } catch (err) {
+        responseDiv.innerHTML = "<p>Something went wrong. Please try again.</p>";
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
